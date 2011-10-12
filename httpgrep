@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'net/http'
+require 'uri'
+
+options = {
+  :annotate => false,
+  :exclude => []
+}
+
+optparse = OptionParser.new do |opts|
+  opts.on('-a', '--annotate', "Annotate output URLs with response code") do |a|
+    options[:annotate] = true
+  end
+  
+  opts.on('--exclude xxx,yyy', Array, "Exclude URLs in the output responding with any of the given response codes") do |f|
+    options[:exclude] = f
+  end
+  
+  opts.on('--include xxx,yyy', Array, "Only inlcude URLs in the output responding with any of the given response codes") do |f|
+    options[:include] = f
+  end
+end
+
+optparse.parse!
+
+
+@connections = {}
+
+def get_conntection(host, port)
+  key = "#{host}#{port}"
+  @connections[key] ||= Net::HTTP.new(host, port)
+end
+
+def get_code(url)
+  uri = URI.parse(url)
+  
+  req = get_conntection(uri.host, uri.port)
+  req.request_head(uri.request_uri).code
+end
+
+ARGF.each_line do |line|
+  code = get_code(line)
+  
+  if options[:exclude]
+    next if options[:exclude].include? code
+  end
+  
+  if options[:include]
+    next unless options[:include].include? code
+  end
+  
+  if options[:annotate]
+    puts code + '; ' + line
+  else
+    puts line
+  end
+end
