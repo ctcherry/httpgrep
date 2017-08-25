@@ -48,6 +48,11 @@ ARGF.each_line do |line|
       puts 'INVALIDURL; ' + line
     end
     next
+  rescue SocketError
+    if options[:annotate]
+      puts 'SOCKETERR; ' + line
+    end
+    next
   end
   
   if options[:exclude]
