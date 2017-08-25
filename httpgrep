@@ -41,7 +41,14 @@ def get_code(url)
 end
 
 ARGF.each_line do |line|
-  code = get_code(line)
+  begin
+    code = get_code(line)
+  rescue URI::InvalidURIError
+    if options[:annotate]
+      puts 'INVALIDURL; ' + line
+    end
+    next
+  end
   
   if options[:exclude]
     next if options[:exclude].include? code
