@@ -28,15 +28,19 @@ optparse.parse!
 
 @connections = {}
 
-def get_conntection(host, port)
+def get_conntection(uri)
+  host = uri.host
+  port = uri.port
   key = "#{host}#{port}"
-  @connections[key] ||= Net::HTTP.new(host, port)
+  http = Net::HTTP.new(host, port)
+  http.use_ssl = uri.scheme == 'https'
+  @connections[key] ||= http
 end
 
 def get_code(url)
   uri = URI.parse(url)
   
-  req = get_conntection(uri.host, uri.port)
+  req = get_conntection(uri)
   req.request_head(uri.request_uri).code
 end
 
@@ -54,8 +58,13 @@ ARGF.each_line do |line|
     end
     next
   rescue Errno::ECONNRESET
-     if options[:annotate]
+    if options[:annotate]
       puts 'CONNRESET; ' + line
+    end
+    next
+  rescue Errno::ECONNREFUSED
+    if options[:annotate]
+      puts 'CONNREFUSED; ' + line
     end
     next
   end
