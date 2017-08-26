@@ -72,6 +72,11 @@ ARGF.each_line do |line|
       puts 'SSLERR; ' + line
     end
     next
+  rescue Timeout::Error
+    if options[:annotate]
+      puts 'TIMEOUT; ' + line
+    end
+    next
   end
   
   if options[:exclude]
