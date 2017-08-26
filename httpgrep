@@ -2,6 +2,7 @@
 
 require 'optparse'
 require 'net/http'
+require 'openssl'
 require 'uri'
 
 options = {
