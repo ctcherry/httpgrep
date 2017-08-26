@@ -53,6 +53,11 @@ ARGF.each_line do |line|
       puts 'SOCKETERR; ' + line
     end
     next
+  rescue Errno::ECONNRESET
+     if options[:annotate]
+      puts 'CONNRESET; ' + line
+    end
+    next
   end
   
   if options[:exclude]
