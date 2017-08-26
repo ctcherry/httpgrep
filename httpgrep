@@ -78,6 +78,14 @@ ARGF.each_line do |line|
       puts 'TIMEOUT; ' + line
     end
     next
+  rescue EOFError
+    if options[:annotate]
+      puts 'EMPTY; ' + line
+    end
+    next
+  rescue StandardError
+    STDERR.puts "Error with input: #{line.strip.inspect}"
+    raise
   end
   
   if options[:exclude]
