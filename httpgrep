@@ -46,7 +46,7 @@ end
 
 ARGF.each_line do |line|
   begin
-    code = get_code(line)
+    code = get_code(line.strip)
   rescue URI::InvalidURIError
     if options[:annotate]
       puts 'INVALIDURL; ' + line
