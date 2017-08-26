@@ -67,6 +67,11 @@ ARGF.each_line do |line|
       puts 'CONNREFUSED; ' + line
     end
     next
+  rescue OpenSSL::SSL::SSLError
+    if options[:annotate]
+      puts 'SSLERR; ' + line
+    end
+    next
   end
   
   if options[:exclude]
